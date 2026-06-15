@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import re
 import secrets
 import mimetypes
 import time
@@ -106,11 +107,11 @@ def extract_multipart_upload(body: bytes, content_type: str) -> tuple[str, bytes
             continue
         header = part[:header_end].decode("utf-8", errors="ignore")
         filename = "upload"
-        for segment in header.split(";"):
-            segment = segment.strip()
-            if segment.startswith("filename="):
-                filename = segment.split("=", 1)[1].strip('"') or filename
-                break
+        filename_match = re.search(r'filename="([^"\r\n]+)"|filename=([^;\r\n]+)', header)
+        if filename_match:
+            filename = Path(
+                (filename_match.group(1) or filename_match.group(2) or filename).strip(),
+            ).name
         content = part[header_end + 4 :].strip(b"\r\n-")
         return filename, content
     raise ValueError("No uploaded file found")
