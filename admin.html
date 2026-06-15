@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCRshows | 后台管理</title>
+    <link rel="icon" href="assets/tcrshows-logo-circle.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <header class="site-header" id="top">
+      <a class="brand" href="index.html#home" aria-label="返回TCRshows首页">
+        <span class="brand-mark">T</span>
+        <span>
+          <strong>TCRshows 后台</strong>
+          <small>content admin</small>
+        </span>
+      </a>
+
+      <nav class="primary-nav" aria-label="后台导航">
+        <a href="index.html">前台首页</a>
+        <a href="#admin-db">数据库</a>
+        <a href="#admin-articles">精选学习</a>
+        <a href="#admin-services">产品服务</a>
+      </nav>
+
+      <a class="header-action" href="/api/auth/logout">退出登录</a>
+    </header>
+
+    <main class="admin-main">
+      <section class="section admin-hero">
+        <p class="eyebrow">Local admin</p>
+        <h1>TCRshows 内容后台</h1>
+        <p>
+          后台修改会保存到当前浏览器本地数据中，前台页面刷新后生效。数据库默认数据来自
+          <code>data/TCRshows-db.xlsx</code> 转换后的 189 条记录。
+        </p>
+      </section>
+
+      <section class="section admin-panel" id="admin-db">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Database</p>
+            <h2>数据库数据</h2>
+          </div>
+          <span class="admin-count" data-db-count></span>
+        </div>
+
+        <div class="admin-actions">
+          <button class="button primary" type="button" data-save-db>保存数据库</button>
+          <button class="button secondary" type="button" data-load-default-db>载入Excel默认数据</button>
+          <button class="button quiet" type="button" data-export-db>导出JSON</button>
+        </div>
+        <div class="admin-upload">
+          <label>
+            <span>上传新的 TCRshows-db.xlsx</span>
+            <input type="file" accept=".xlsx" data-db-xlsx />
+          </label>
+          <button class="button secondary" type="button" data-upload-xlsx>上传Excel并写入后台</button>
+        </div>
+        <textarea
+          class="admin-textarea"
+          data-db-json
+          spellcheck="false"
+          aria-label="数据库JSON"
+        ></textarea>
+      </section>
+
+      <section class="section admin-panel" id="admin-articles">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Learning</p>
+            <h2>精选学习</h2>
+          </div>
+          <span class="admin-count" data-article-count></span>
+        </div>
+
+        <div class="admin-editor">
+          <div class="admin-list" data-article-list-admin></div>
+          <form class="admin-form" data-article-form>
+            <input type="hidden" name="index" />
+            <label>
+              <span>标题</span>
+              <input name="title" required />
+            </label>
+            <label>
+              <span>分类</span>
+              <input name="category" placeholder="TCR-T / mRNA / 肿瘤免疫" required />
+            </label>
+            <label>
+              <span>作者</span>
+              <input name="author" required />
+            </label>
+            <label>
+              <span>时间</span>
+              <input name="date" placeholder="2025-01-04 14:12:44" required />
+            </label>
+            <label>
+              <span>重要程度</span>
+              <input name="level" placeholder="重要 / 一般" />
+            </label>
+            <label>
+              <span>标题链接</span>
+              <input name="url" placeholder="detail.html 或 https://..." />
+            </label>
+            <label class="full-span">
+              <span>摘要</span>
+              <textarea name="summary" rows="4"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="button primary" type="submit">保存内容</button>
+              <button class="button secondary" type="button" data-new-article>新增</button>
+              <button class="button quiet" type="button" data-delete-article>删除</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section admin-panel" id="admin-services">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Services</p>
+            <h2>产品与服务</h2>
+          </div>
+          <span class="admin-count" data-service-count></span>
+        </div>
+
+        <div class="admin-editor">
+          <div class="admin-list" data-service-list-admin></div>
+          <form class="admin-form" data-service-form>
+            <input type="hidden" name="index" />
+            <label>
+              <span>标题</span>
+              <input name="title" required />
+            </label>
+            <label>
+              <span>分类</span>
+              <select name="category" required>
+                <option>TCR-T</option>
+                <option>mRNA</option>
+                <option>pHLA</option>
+                <option>TCR蛋白</option>
+                <option>细胞株构建</option>
+              </select>
+            </label>
+            <label>
+              <span>作者</span>
+              <input name="author" required />
+            </label>
+            <label>
+              <span>时间</span>
+              <input name="date" placeholder="2025-01-18 16:02:16" required />
+            </label>
+            <label>
+              <span>标题链接</span>
+              <input name="url" placeholder="detail.html 或 https://..." />
+            </label>
+            <label>
+              <span>缩略图类型</span>
+              <select name="art">
+                <option value="assay-plot">检测图</option>
+                <option value="apc-art">APC</option>
+                <option value="tube-art">试管</option>
+                <option value="cell-art">细胞</option>
+                <option value="mrna-art">mRNA</option>
+                <option value="phla-art">pHLA</option>
+                <option value="protein-art">蛋白</option>
+              </select>
+            </label>
+            <label class="full-span">
+              <span>内容描述</span>
+              <textarea name="text" rows="4"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="button primary" type="submit">保存服务</button>
+              <button class="button secondary" type="button" data-new-service>新增</button>
+              <button class="button quiet" type="button" data-delete-service>删除</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="data/site-data.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

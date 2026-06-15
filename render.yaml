@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tcrshows
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: TCRSHOWS_ADMIN_USER
+        value: admin
+      - key: TCRSHOWS_ADMIN_PASSWORD
+        sync: false
