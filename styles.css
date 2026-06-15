@@ -900,6 +900,12 @@ td {
   overflow: hidden;
 }
 
+.service-upload-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .assay-plot,
 .apc-art,
 .tube-art,

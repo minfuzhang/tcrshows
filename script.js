@@ -121,10 +121,13 @@ function renderServices(filter = "TCR-T") {
     .map((item) => {
       const url = safeUrl(item.url);
       const target = url.startsWith("http") ? ' target="_blank" rel="noopener"' : "";
+      const imageMarkup = item.image
+        ? `<img class="service-upload-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}缩略图" />`
+        : `<span class="${escapeHtml(item.art || "cell-art")}"></span>`;
       return `
         <article class="service-card">
           <div class="service-art" aria-hidden="true">
-            <span class="${escapeHtml(item.art || "cell-art")}"></span>
+            ${imageMarkup}
           </div>
           <div class="service-content">
             <h3><a class="title-link" href="${escapeHtml(url)}"${target}>${escapeHtml(item.title)}</a></h3>

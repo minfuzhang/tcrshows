@@ -4,6 +4,7 @@ import html
 import json
 import os
 import secrets
+import mimetypes
 import time
 from http import HTTPStatus
 from http.cookies import SimpleCookie
@@ -17,6 +18,7 @@ import openpyxl
 ROOT = Path(__file__).resolve().parent
 DATA_FILE = ROOT / "data" / "site-data.js"
 EXCEL_FILE = ROOT / "data" / "TCRshows-db.xlsx"
+UPLOAD_DIR = ROOT / "assets" / "uploads"
 PREFIX = "window.TCRSHOWS_DEFAULT_DATA = "
 DB_FIELDS = [
     "id",
@@ -88,6 +90,46 @@ def extract_multipart_file(body: bytes, content_type: str) -> bytes:
         content = part[header_end + 4 :]
         return content.strip(b"\r\n-")
     raise ValueError("No uploaded file found")
+
+
+def extract_multipart_upload(body: bytes, content_type: str) -> tuple[str, bytes]:
+    marker = "boundary="
+    if marker not in content_type:
+        raise ValueError("Missing multipart boundary")
+
+    boundary = ("--" + content_type.split(marker, 1)[1]).encode()
+    for part in body.split(boundary):
+        if b"filename=" not in part:
+            continue
+        header_end = part.find(b"\r\n\r\n")
+        if header_end < 0:
+            continue
+        header = part[:header_end].decode("utf-8", errors="ignore")
+        filename = "upload"
+        for segment in header.split(";"):
+            segment = segment.strip()
+            if segment.startswith("filename="):
+                filename = segment.split("=", 1)[1].strip('"') or filename
+                break
+        content = part[header_end + 4 :].strip(b"\r\n-")
+        return filename, content
+    raise ValueError("No uploaded file found")
+
+
+def save_uploaded_image(filename: str, content: bytes) -> str:
+    extension = Path(filename).suffix.lower()
+    allowed = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+    if extension not in allowed:
+        guessed = mimetypes.guess_extension(mimetypes.guess_type(filename)[0] or "")
+        extension = guessed if guessed in allowed else ""
+    if extension not in allowed:
+        raise ValueError("Only jpg, png, webp, and gif images are allowed")
+
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    output_name = f"service-{int(time.time())}-{secrets.token_hex(6)}{extension}"
+    output_path = UPLOAD_DIR / output_name
+    output_path.write_bytes(content)
+    return f"assets/uploads/{output_name}"
 
 
 def purge_sessions() -> None:
@@ -253,7 +295,7 @@ class TCRshowsHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(body_bytes)
                 return
 
-            if route in {"/api/data", "/api/import-db"} and not is_authenticated(self):
+            if route in {"/api/data", "/api/import-db", "/api/upload-image"} and not is_authenticated(self):
                 self.send_json({"ok": False, "error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED)
                 return
 
@@ -277,6 +319,15 @@ class TCRshowsHandler(SimpleHTTPRequestHandler):
                 payload["dbRows"] = db_rows
                 write_payload(payload)
                 self.send_json({"ok": True, "dbRows": db_rows, "count": len(db_rows)})
+                return
+
+            if route == "/api/upload-image":
+                filename, file_bytes = extract_multipart_upload(
+                    body,
+                    self.headers.get("Content-Type", ""),
+                )
+                image_url = save_uploaded_image(filename, file_bytes)
+                self.send_json({"ok": True, "url": image_url})
                 return
 
             self.send_error(HTTPStatus.NOT_FOUND)

@@ -18,6 +18,8 @@ let services = readStore(STORAGE_KEYS.services, defaultData.services);
 const dbJson = document.querySelector("[data-db-json]");
 const articleForm = document.querySelector("[data-article-form]");
 const serviceForm = document.querySelector("[data-service-form]");
+const serviceImageFile = document.querySelector("[data-service-image-file]");
+const uploadServiceImage = document.querySelector("[data-upload-service-image]");
 
 function readStore(key, fallback) {
   try {
@@ -69,6 +71,12 @@ function fillForm(form, item, index) {
     if (form.elements[key]) form.elements[key].value = value ?? "";
   });
   form.elements.index.value = index ?? "";
+}
+
+function fillServiceImage(imageUrl = "") {
+  if (serviceForm.elements.image) {
+    serviceForm.elements.image.value = imageUrl;
+  }
 }
 
 function downloadJson(filename, value) {
@@ -235,10 +243,34 @@ document.querySelector("[data-new-service]").addEventListener("click", () => {
       date: "",
       url: "#",
       art: "cell-art",
+      image: "",
       text: "",
     },
     "",
   );
+});
+
+uploadServiceImage.addEventListener("click", async () => {
+  const file = serviceImageFile.files[0];
+  if (!file) {
+    alert("请先选择一张图片。");
+    return;
+  }
+  if (!hasServerBackend) {
+    alert("请从服务器地址打开后台后再上传图片。");
+    return;
+  }
+
+  const form = new FormData();
+  form.append("file", file);
+  const response = await fetch("/api/upload-image", { method: "POST", body: form });
+  if (!response.ok) {
+    alert("图片上传失败，请检查图片格式。");
+    return;
+  }
+  const payload = await response.json();
+  fillServiceImage(payload.url);
+  alert("缩略图已上传并填入表单。保存后前台会显示这张图片。");
 });
 
 document.querySelector("[data-delete-service]").addEventListener("click", () => {

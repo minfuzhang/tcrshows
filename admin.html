@@ -167,6 +167,19 @@
                 <option value="protein-art">蛋白</option>
               </select>
             </label>
+            <label>
+              <span>缩略图图片地址</span>
+              <input name="image" placeholder="上传图片后自动生成，也可填写图片URL" />
+            </label>
+            <div class="admin-upload full-span">
+              <label>
+                <span>上传本地缩略图</span>
+                <input type="file" accept="image/*" data-service-image-file />
+              </label>
+              <button class="button secondary" type="button" data-upload-service-image>
+                上传并使用此图片
+              </button>
+            </div>
             <label class="full-span">
               <span>内容描述</span>
               <textarea name="text" rows="4"></textarea>
