@@ -3278,13 +3278,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "系统阐述癌症特异性TCR的发现方法与技术平台、TCR-T细胞疗法临床前研发策略，并概述当前该疗法的临床研究现状。总结了TCR-T细胞所识别的肿瘤抗原类别、抗原筛选策略、临床研究适应证及受试患者选择标准"
     },
     {
-      "title": "???????????T?????????HLA-I????",
+      "title": "AI设计TCR，利用融合物理模拟-AI方法对内源性TCR进行工程化改造，使其识别肿瘤新抗原",
       "category": "TCR-T",
-      "author": "???minfu",
-      "date": "2025-01-04 14:35:59",
-      "level": "??",
-      "url": "#",
-      "summary": "???????T????????"
+      "author": "minfu",
+      "date": "2026-05-26",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/N4ZSwSEy4ixdYtpioR28gQ",
+      "summary": "一种AI驱动的新方法，融合基于物理原理的模拟与生成式AI技术，成功实现了针对MHC-I呈递的特定表位的TCR工程化改造。利用该方法，针对两种肿瘤抗原设计了TCR——HERC1新抗原和突变型EGFR T790M新抗原"
     }
   ],
   "services": [
