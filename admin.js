@@ -79,6 +79,44 @@ function fillServiceImage(imageUrl = "") {
   }
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result || "")));
+    reader.addEventListener("error", () => reject(new Error("图片读取失败")));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", () => reject(new Error("图片加载失败")));
+    image.src = src;
+  });
+}
+
+async function fileToServiceImage(file) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("请选择图片文件");
+  }
+
+  const sourceUrl = await readFileAsDataUrl(file);
+  const image = await loadImage(sourceUrl);
+  const maxSize = 720;
+  const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", 0.86);
+}
 function downloadJson(filename, value) {
   const blob = new Blob([JSON.stringify(value, null, 2)], {
     type: "application/json;charset=utf-8",
@@ -253,24 +291,22 @@ document.querySelector("[data-new-service]").addEventListener("click", () => {
 uploadServiceImage.addEventListener("click", async () => {
   const file = serviceImageFile.files[0];
   if (!file) {
-    alert("请先选择一张图片。");
-    return;
-  }
-  if (!hasServerBackend) {
-    alert("请从服务器地址打开后台后再上传图片。");
+    alert("请选择一张图片。");
     return;
   }
 
-  const form = new FormData();
-  form.append("file", file);
-  const response = await fetch("/api/upload-image", { method: "POST", body: form });
-  if (!response.ok) {
-    alert("图片上传失败，请检查图片格式。");
-    return;
+  try {
+    uploadServiceImage.disabled = true;
+    uploadServiceImage.textContent = "处理中...";
+    const imageDataUrl = await fileToServiceImage(file);
+    fillServiceImage(imageDataUrl);
+    alert("缩略图已生成并填入表单，保存后前台即可显示。");
+  } catch (error) {
+    alert(`图片处理失败：${error.message}`);
+  } finally {
+    uploadServiceImage.disabled = false;
+    uploadServiceImage.textContent = "上传并使用此图片";
   }
-  const payload = await response.json();
-  fillServiceImage(payload.url);
-  alert("缩略图已上传并填入表单。保存后前台会显示这张图片。");
 });
 
 document.querySelector("[data-delete-service]").addEventListener("click", () => {
