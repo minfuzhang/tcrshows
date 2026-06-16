@@ -3251,13 +3251,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "转基因TCR与CAR联手，扩大了针对GPC3的受体库，用于HCC T细胞疗法"
     },
     {
-      "title": "??mRNA???????????????",
+      "title": "瑞金医院KRAS G12V mRNA肿瘤疫苗联合PD-1单抗治疗晚期实体瘤临床获益",
       "category": "mRNA",
-      "author": "???minfu",
-      "date": "2024-12-30 16:49:51",
-      "level": "??",
-      "url": "#",
-      "summary": "????mRNA??????????"
+      "author": "minfu",
+      "date": "2024-06-29",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/yLcsva0ilynbw9-W7DbbLQ",
+      "summary": "针对KRAS G12V单靶点的mRNA肿瘤疫苗在实体瘤中的治疗效果"
     },
     {
       "title": "TCR mRNA???T???????????MSI??????",
