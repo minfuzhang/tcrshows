@@ -3260,13 +3260,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "针对KRAS G12V单靶点的mRNA肿瘤疫苗在实体瘤中的治疗效果"
     },
     {
-      "title": "TCR mRNA???T???????????MSI??????",
+      "title": "基于mRNA的定制APC可引发强烈的CD8⁺和CD4⁺ T细胞反应，并有效诱导功能性抗原特异性CTL反应",
       "category": "mRNA",
-      "author": "???minfu",
-      "date": "2024-12-30 16:49:51",
-      "level": "??",
-      "url": "#",
-      "summary": "??TCR mRNA??T?????????"
+      "author": "minfu",
+      "date": "2025-10-21",
+      "level": "★★",
+      "url": "https://mp.weixin.qq.com/s/1GusRCd6iLoKA_o_MjN2uA",
+      "summary": "不仅在体外的人PBMCs中，也在HLA-A*02:01转基因小鼠体内成功激活了NY-ESO-1特异性的CD8⁺ T细胞，凸显其临床转化潜力"
     },
     {
       "title": "??-????????????????",
