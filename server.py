@@ -17,7 +17,8 @@ import openpyxl
 
 
 ROOT = Path(__file__).resolve().parent
-DATA_FILE = ROOT / "data" / "site-data.js"
+DEFAULT_DATA_FILE = ROOT / "data" / "site-data.js"
+DATA_FILE = ROOT / "storage" / "site-data.js"
 EXCEL_FILE = ROOT / "data" / "TCRshows-db.xlsx"
 UPLOAD_DIR = ROOT / "assets" / "uploads"
 PREFIX = "window.TCRSHOWS_DEFAULT_DATA = "
@@ -46,7 +47,8 @@ SESSIONS: dict[str, float] = {}
 
 
 def read_payload() -> dict:
-    text = DATA_FILE.read_text(encoding="utf-8").strip()
+    source_file = DATA_FILE if DATA_FILE.exists() else DEFAULT_DATA_FILE
+    text = source_file.read_text(encoding="utf-8").strip()
     if text.startswith(PREFIX):
         text = text[len(PREFIX) :]
     if text.endswith(";"):
@@ -55,7 +57,7 @@ def read_payload() -> dict:
 
 
 def write_payload(payload: dict) -> None:
-    DATA_FILE.parent.mkdir(exist_ok=True)
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     DATA_FILE.write_text(
         PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n",
         encoding="utf-8",

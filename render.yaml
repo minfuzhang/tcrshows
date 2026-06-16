@@ -4,6 +4,10 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
+    disk:
+      name: tcrshows-storage
+      mountPath: /opt/render/project/src/storage
+      sizeGB: 1
     envVars:
       - key: TCRSHOWS_ADMIN_USER
         value: admin
