@@ -3242,13 +3242,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "TCRshows汇总的90页的Human TCR TRAV和TRAJ序列和Human TCR TRBV、TRBD和TRBJ序列"
     },
     {
-      "title": "?????????????HLA-A2 GPC3???TCR-?T??",
+      "title": "全面的体内外验证数据：靶向HLA-A2 GPC3的小鼠TCR-人T细胞，在小鼠中有效控制人肝细胞癌，优于GPC3 CAR-T细胞",
       "category": "TCR-T",
-      "author": "???minfu",
-      "date": "2024-12-30 16:49:51",
-      "level": "??",
-      "url": "#",
-      "summary": "????HLA-A2 GPC3?TCR-T?????"
+      "author": "minfu",
+      "date": "2024-12-11",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/4HTLWNF1toOz-c4CvignLA",
+      "summary": "转基因TCR与CAR联手，扩大了针对GPC3的受体库，用于HCC T细胞疗法"
     },
     {
       "title": "??mRNA???????????????",
