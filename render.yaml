@@ -4,12 +4,14 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
-    disk:
-      name: tcrshows-storage
-      mountPath: /opt/render/project/src/storage
-      sizeGB: 1
     envVars:
       - key: TCRSHOWS_ADMIN_USER
         value: admin
       - key: TCRSHOWS_ADMIN_PASSWORD
         sync: false
+      - key: TCRSHOWS_GITHUB_TOKEN
+        sync: false
+      - key: TCRSHOWS_GITHUB_REPO
+        value: minfuzhang/tcrshows
+      - key: TCRSHOWS_GITHUB_BRANCH
+        value: main

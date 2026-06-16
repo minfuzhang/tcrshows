@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import html
 import json
 import os
@@ -7,11 +8,13 @@ import re
 import secrets
 import mimetypes
 import time
+import urllib.error
+import urllib.request
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, quote, urlsplit
 
 import openpyxl
 
@@ -41,6 +44,10 @@ DB_FIELDS = [
 ]
 ADMIN_USERNAME = os.environ.get("TCRSHOWS_ADMIN_USER", "admin")
 ADMIN_PASSWORD = os.environ.get("TCRSHOWS_ADMIN_PASSWORD", "TCRshows2026!")
+GITHUB_TOKEN = os.environ.get("TCRSHOWS_GITHUB_TOKEN", "").strip()
+GITHUB_REPO = os.environ.get("TCRSHOWS_GITHUB_REPO", "minfuzhang/tcrshows").strip()
+GITHUB_BRANCH = os.environ.get("TCRSHOWS_GITHUB_BRANCH", "main").strip()
+GITHUB_DATA_PATH = os.environ.get("TCRSHOWS_GITHUB_DATA_PATH", "data/site-data.js").strip()
 SESSION_COOKIE = "tcrshows_admin_session"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 SESSIONS: dict[str, float] = {}
@@ -56,12 +63,59 @@ def read_payload() -> dict:
     return json.loads(text)
 
 
+def serialize_payload(payload: dict) -> str:
+    return PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n"
+
+
+def github_request(method: str, url: str, payload: dict | None = None) -> dict:
+    if not GITHUB_TOKEN:
+        raise RuntimeError("Render 未配置 TCRSHOWS_GITHUB_TOKEN，内容无法持久保存到 GitHub")
+
+    data = None
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Content-Type": "application/json",
+        "User-Agent": "tcrshows-admin",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if payload is not None:
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            body = response.read().decode("utf-8")
+            return json.loads(body) if body else {}
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"GitHub 保存失败：{exc.code} {detail}") from exc
+
+
+def persist_payload_to_github(serialized_payload: str) -> None:
+    encoded_path = quote(GITHUB_DATA_PATH)
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+    current_file = github_request("GET", f"{url}?ref={quote(GITHUB_BRANCH)}")
+    sha = current_file.get("sha")
+    payload = {
+        "message": "Update TCRshows site data from admin",
+        "content": base64.b64encode(serialized_payload.encode("utf-8")).decode("ascii"),
+        "branch": GITHUB_BRANCH,
+        "committer": {
+            "name": "TCRshows Admin",
+            "email": "tcrshows-admin@users.noreply.github.com",
+        },
+    }
+    if sha:
+        payload["sha"] = sha
+    github_request("PUT", url, payload)
+
+
 def write_payload(payload: dict) -> None:
+    serialized_payload = serialize_payload(payload)
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    DATA_FILE.write_text(
-        PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n",
-        encoding="utf-8",
-    )
+    DATA_FILE.write_text(serialized_payload, encoding="utf-8")
+    persist_payload_to_github(serialized_payload)
 
 
 def convert_excel(path: Path) -> tuple[list[str], list[dict]]:
