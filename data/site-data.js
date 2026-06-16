@@ -3233,13 +3233,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
   ],
   "articles": [
     {
-      "title": "Human TCR [TRAV TRAJ]?[TRBV TRBJ]????",
+      "title": "Human TCR [TRAV TRAJ]、[TRBV TRBJ]序列汇总",
       "category": "TCR-T",
-      "author": "???minfu",
-      "date": "2024-12-30 16:49:51",
-      "level": "??",
-      "url": "#",
-      "summary": "??Human TCR??TRAV?TRAJ?TRBV?TRBJ?????"
+      "author": "minfu",
+      "date": "2025-01-08",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/2G_FEli7kxLA1-cykv25wg",
+      "summary": "TCRshows汇总的90页的Human TCR TRAV和TRAJ序列和Human TCR TRBV、TRBD和TRBJ序列"
     },
     {
       "title": "?????????????HLA-A2 GPC3???TCR-?T??",
