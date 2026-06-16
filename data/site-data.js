@@ -3269,13 +3269,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "不仅在体外的人PBMCs中，也在HLA-A*02:01转基因小鼠体内成功激活了NY-ESO-1特异性的CD8⁺ T细胞，凸显其临床转化潜力"
     },
     {
-      "title": "??-????????????????",
-      "category": "????",
-      "author": "???minfu",
-      "date": "2025-01-04 14:12:44",
-      "level": "??",
-      "url": "#",
-      "summary": "???-???????????????"
+      "title": "TCR-T细胞治疗：进展、挑战与未来展望",
+      "category": "TCR-T",
+      "author": "minfu",
+      "date": "2026-04-07",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/Ofyh1kchWC-LRPbvIKUhfg",
+      "summary": "系统阐述癌症特异性TCR的发现方法与技术平台、TCR-T细胞疗法临床前研发策略，并概述当前该疗法的临床研究现状。总结了TCR-T细胞所识别的肿瘤抗原类别、抗原筛选策略、临床研究适应证及受试患者选择标准"
     },
     {
       "title": "???????????T?????????HLA-I????",
