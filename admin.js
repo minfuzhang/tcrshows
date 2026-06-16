@@ -34,6 +34,28 @@ function saveStore(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+function hasSavedStore() {
+  return Object.values(STORAGE_KEYS).some((key) => localStorage.getItem(key));
+}
+
+function applyPayload(payload) {
+  dbRows = Array.isArray(payload.dbRows) ? payload.dbRows : dbRows;
+  articles = Array.isArray(payload.articles) ? payload.articles : articles;
+  services = Array.isArray(payload.services) ? payload.services : services;
+  saveStore(STORAGE_KEYS.dbRows, dbRows);
+  saveStore(STORAGE_KEYS.articles, articles);
+  saveStore(STORAGE_KEYS.services, services);
+}
+
+async function loadServerData() {
+  if (!hasServerBackend) return;
+
+  const response = await fetch(`/api/data?ts=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) return;
+  const payload = await response.json();
+  applyPayload(payload);
+}
+
 async function persistAll() {
   saveStore(STORAGE_KEYS.dbRows, dbRows);
   saveStore(STORAGE_KEYS.articles, articles);
@@ -317,6 +339,13 @@ document.querySelector("[data-delete-service]").addEventListener("click", () => 
   renderServiceList(0);
 });
 
-renderDb();
-renderArticleList();
-renderServiceList();
+async function initAdmin() {
+  if (!hasSavedStore()) {
+    await loadServerData();
+  }
+  renderDb();
+  renderArticleList();
+  renderServiceList();
+}
+
+initAdmin();

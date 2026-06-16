@@ -253,14 +253,14 @@ class TCRshowsHandler(SimpleHTTPRequestHandler):
             self.wfile.write(body)
             return
 
+        if route == "/api/data":
+            self.send_json(read_payload())
+            return
+
         if route.startswith("/api/") and route not in {"/api/auth/login", "/api/auth/logout"}:
             if not is_authenticated(self):
                 self.send_json({"ok": False, "error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED)
                 return
-
-        if route == "/api/data":
-            self.send_json(read_payload())
-            return
 
         super().do_GET()
 

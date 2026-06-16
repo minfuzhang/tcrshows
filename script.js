@@ -31,6 +31,8 @@ const defaultData = window.TCRSHOWS_DEFAULT_DATA || {
 let dbRows = readStore(STORAGE_KEYS.dbRows, defaultData.dbRows);
 let articles = readStore(STORAGE_KEYS.articles, defaultData.articles);
 let services = readStore(STORAGE_KEYS.services, defaultData.services);
+let activeArticleFilter = "all";
+let activeServiceFilter = "TCR-T";
 
 const resultBody = document.querySelector("[data-result-body]");
 const resultCount = document.querySelector("[data-result-count]");
@@ -47,6 +49,30 @@ function readStore(key, fallback) {
     return value ? JSON.parse(value) : fallback;
   } catch {
     return fallback;
+  }
+}
+
+function saveStore(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+async function loadServerData() {
+  if (location.protocol !== "http:" && location.protocol !== "https:") return;
+
+  try {
+    const response = await fetch(`/api/data?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    dbRows = Array.isArray(payload.dbRows) ? payload.dbRows : dbRows;
+    articles = Array.isArray(payload.articles) ? payload.articles : articles;
+    services = Array.isArray(payload.services) ? payload.services : services;
+    saveStore(STORAGE_KEYS.dbRows, dbRows);
+    saveStore(STORAGE_KEYS.articles, articles);
+    saveStore(STORAGE_KEYS.services, services);
+    renderArticles(activeArticleFilter);
+    renderServices(activeServiceFilter);
+  } catch {
+    // Keep the bundled/default data available when the server cannot be reached.
   }
 }
 
@@ -190,6 +216,7 @@ document.querySelector("[data-search-form]").addEventListener("submit", (event) 
 document.querySelectorAll("[data-article-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     const filter = button.dataset.articleFilter;
+    activeArticleFilter = filter;
     setActive("[data-article-filter]", filter);
     renderArticles(filter);
   });
@@ -198,6 +225,7 @@ document.querySelectorAll("[data-article-filter]").forEach((button) => {
 document.querySelectorAll("[data-service-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     const filter = button.dataset.serviceFilter;
+    activeServiceFilter = filter;
     setActive("[data-service-filter]", filter);
     renderServices(filter);
   });
@@ -244,3 +272,4 @@ function initTherapyCarousel() {
 initTherapyCarousel();
 renderArticles();
 renderServices();
+loadServerData();
