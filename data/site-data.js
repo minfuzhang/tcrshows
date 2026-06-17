@@ -3294,6 +3294,33 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "level": "★",
       "url": "https://mp.weixin.qq.com/s/8Y65tK2I7B9w40AcuAjg-w",
       "summary": "“Cancer-Immunity ”循环，为业界开发肿瘤免疫治疗提供了一些思考。癌症-免疫循环为理解产生抗肿瘤免疫反应的一系列事件提供了一个框架"
+    },
+    {
+      "title": "Protocol | 从健康供体中诱导新抗原反应性T细胞",
+      "category": "TCR-T",
+      "author": "minfu",
+      "date": "2024-06-12",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/j2kTmMyEgFnxGAWCTvqD_Q",
+      "summary": "一种标准化方案，用于从健康供体T细胞库中诱导新表位反应性T细胞，而不受荷瘤宿主潜在的免疫抑制环境的影响"
+    },
+    {
+      "title": "Protocol | 从健康供体中诱导新抗原反应性T细胞",
+      "category": "TCR-T",
+      "author": "minfu",
+      "date": "2024-06-12",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/j2kTmMyEgFnxGAWCTvqD_Q",
+      "summary": "一种标准化方案，用于从健康供体T细胞库中诱导新表位反应性T细胞，而不受荷瘤宿主潜在的免疫抑制环境的影响"
+    },
+    {
+      "title": "Protocol | 从健康供体中诱导新抗原反应性T细胞",
+      "category": "TCR-T",
+      "author": "minfu",
+      "date": "2024-06-12",
+      "level": "★★★",
+      "url": "https://mp.weixin.qq.com/s/j2kTmMyEgFnxGAWCTvqD_Q",
+      "summary": "一种标准化方案，用于从健康供体T细胞库中诱导新表位反应性T细胞，而不受荷瘤宿主潜在的免疫抑制环境的影响"
     }
   ],
   "services": [
