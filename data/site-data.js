@@ -3285,6 +3285,15 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "level": "★★★",
       "url": "https://mp.weixin.qq.com/s/N4ZSwSEy4ixdYtpioR28gQ",
       "summary": "一种AI驱动的新方法，融合基于物理原理的模拟与生成式AI技术，成功实现了针对MHC-I呈递的特定表位的TCR工程化改造。利用该方法，针对两种肿瘤抗原设计了TCR——HERC1新抗原和突变型EGFR T790M新抗原"
+    },
+    {
+      "title": "癌症-免疫循环，为肿瘤免疫治疗提供思路",
+      "category": "肿瘤免疫",
+      "author": "minfu",
+      "date": "2023-12-01",
+      "level": "★",
+      "url": "https://mp.weixin.qq.com/s/8Y65tK2I7B9w40AcuAjg-w",
+      "summary": "“Cancer-Immunity ”循环，为业界开发肿瘤免疫治疗提供了一些思考。癌症-免疫循环为理解产生抗肿瘤免疫反应的一系列事件提供了一个框架"
     }
   ],
   "services": [
