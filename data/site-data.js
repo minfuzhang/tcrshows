@@ -3305,13 +3305,13 @@ window.TCRSHOWS_DEFAULT_DATA = {
       "summary": "一种标准化方案，用于从健康供体T细胞库中诱导新表位反应性T细胞，而不受荷瘤宿主潜在的免疫抑制环境的影响"
     },
     {
-      "title": "Protocol | 从健康供体中诱导新抗原反应性T细胞",
+      "title": "ASCO 2026 —— TCR-T和TCE的临床试验结果汇集",
       "category": "TCR-T",
       "author": "minfu",
-      "date": "2024-06-12",
+      "date": "2026-04-06",
       "level": "★★★",
-      "url": "https://mp.weixin.qq.com/s/j2kTmMyEgFnxGAWCTvqD_Q",
-      "summary": "一种标准化方案，用于从健康供体T细胞库中诱导新表位反应性T细胞，而不受荷瘤宿主潜在的免疫抑制环境的影响"
+      "url": "https://mp.weixin.qq.com/s/EJEbuKzT6JLc5s-FtBjY7w",
+      "summary": "IMA401；anzu-cel（IMA203）；IMA203CD8；KRAS G12V；afami-cel；lete-cel；NT-175"
     }
   ],
   "services": [
