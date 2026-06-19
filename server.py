@@ -270,6 +270,18 @@ def render_login_page(error_message: str = "") -> bytes:
     return page.encode("utf-8")
 
 
+def render_index_page() -> bytes:
+    page = (ROOT / "index.html").read_text(encoding="utf-8")
+    db_count = len(read_payload().get("dbRows", []))
+    page = re.sub(
+        r'(<span class="metric" data-db-total>)[^<]*(</span>)',
+        rf"\g<1>{db_count}\2",
+        page,
+        count=1,
+    )
+    return page.encode("utf-8")
+
+
 class TCRshowsHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, directory=str(ROOT), **kwargs)
@@ -288,6 +300,15 @@ class TCRshowsHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         route = urlsplit(self.path).path
+
+        if route in {"/", "/index.html"}:
+            body = render_index_page()
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
 
         if route == "/api/auth/logout":
             token = get_cookie_token(self.headers.get("Cookie"))
