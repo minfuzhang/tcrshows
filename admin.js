@@ -154,6 +154,10 @@ function downloadJson(filename, value) {
 function renderDb() {
   dbJson.value = JSON.stringify(dbRows, null, 2);
   document.querySelector("[data-db-count]").textContent = `${dbRows.length} 条记录`;
+  const adminDbTotal = document.querySelector("[data-admin-db-total]");
+  if (adminDbTotal) {
+    adminDbTotal.textContent = String(dbRows.length);
+  }
 }
 
 function renderArticleList(activeIndex = 0) {

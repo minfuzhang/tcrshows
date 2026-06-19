@@ -42,6 +42,7 @@ const serviceList = document.querySelector("[data-service-list]");
 const therapyTrack = document.querySelector("[data-therapy-track]");
 const therapyDots = document.querySelectorAll("[data-therapy-slide]");
 const scrollTopLink = document.querySelector("[data-scroll-top]");
+const dbTotal = document.querySelector("[data-db-total]");
 
 function readStore(key, fallback) {
   try {
@@ -69,6 +70,7 @@ async function loadServerData() {
     saveStore(STORAGE_KEYS.dbRows, dbRows);
     saveStore(STORAGE_KEYS.articles, articles);
     saveStore(STORAGE_KEYS.services, services);
+    renderMetrics();
     renderArticles(activeArticleFilter);
     renderServices(activeServiceFilter);
   } catch {
@@ -113,6 +115,12 @@ function renderResults(rows) {
     )
     .join("");
   resultCount.textContent = `${rows.length} 条匹配`;
+}
+
+function renderMetrics() {
+  if (dbTotal) {
+    dbTotal.textContent = String(dbRows.length);
+  }
 }
 
 function renderArticles(filter = "all") {
@@ -270,6 +278,7 @@ function initTherapyCarousel() {
 }
 
 initTherapyCarousel();
+renderMetrics();
 renderArticles();
 renderServices();
 loadServerData();
