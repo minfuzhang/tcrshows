@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 import html
 import json
 import os
@@ -48,6 +47,7 @@ GITHUB_TOKEN = os.environ.get("TCRSHOWS_GITHUB_TOKEN", "").strip()
 GITHUB_REPO = os.environ.get("TCRSHOWS_GITHUB_REPO", "minfuzhang/tcrshows").strip()
 GITHUB_BRANCH = os.environ.get("TCRSHOWS_GITHUB_BRANCH", "main").strip()
 GITHUB_DATA_PATH = os.environ.get("TCRSHOWS_GITHUB_DATA_PATH", "data/site-data.js").strip()
+GITHUB_INDEX_PATH = os.environ.get("TCRSHOWS_GITHUB_INDEX_PATH", "index.html").strip()
 SESSION_COOKIE = "tcrshows_admin_session"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 SESSIONS: dict[str, float] = {}
@@ -65,6 +65,15 @@ def read_payload() -> dict:
 
 def serialize_payload(payload: dict) -> str:
     return PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n"
+
+
+def apply_db_count_to_index(page: str, db_count: int) -> str:
+    return re.sub(
+        r'(<span class="metric" data-db-total>)[^<]*(</span>)',
+        rf"\g<1>{db_count}\2",
+        page,
+        count=1,
+    )
 
 
 def github_request(method: str, url: str, payload: dict | None = None) -> dict:
@@ -92,30 +101,75 @@ def github_request(method: str, url: str, payload: dict | None = None) -> dict:
         raise RuntimeError(f"GitHub 保存失败：{exc.code} {detail}") from exc
 
 
-def persist_payload_to_github(serialized_payload: str) -> None:
-    encoded_path = quote(GITHUB_DATA_PATH)
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
-    current_file = github_request("GET", f"{url}?ref={quote(GITHUB_BRANCH)}")
-    sha = current_file.get("sha")
-    payload = {
-        "message": "Update TCRshows site data from admin",
-        "content": base64.b64encode(serialized_payload.encode("utf-8")).decode("ascii"),
-        "branch": GITHUB_BRANCH,
-        "committer": {
-            "name": "TCRshows Admin",
-            "email": "tcrshows-admin@users.noreply.github.com",
+def create_github_blob(api_root: str, content: str) -> str:
+    blob = github_request(
+        "POST",
+        f"{api_root}/git/blobs",
+        {"content": content, "encoding": "utf-8"},
+    )
+    return blob["sha"]
+
+
+def persist_payload_to_github(serialized_payload: str, db_count: int) -> None:
+    api_root = f"https://api.github.com/repos/{GITHUB_REPO}"
+    branch_ref = quote(f"heads/{GITHUB_BRANCH}", safe="/")
+    ref = github_request("GET", f"{api_root}/git/ref/{branch_ref}")
+    parent_sha = ref["object"]["sha"]
+    parent_commit = github_request("GET", f"{api_root}/git/commits/{parent_sha}")
+    base_tree_sha = parent_commit["tree"]["sha"]
+
+    index_html = (ROOT / "index.html").read_text(encoding="utf-8")
+    index_html = apply_db_count_to_index(index_html, db_count)
+    data_blob_sha = create_github_blob(api_root, serialized_payload)
+    index_blob_sha = create_github_blob(api_root, index_html)
+
+    tree = github_request(
+        "POST",
+        f"{api_root}/git/trees",
+        {
+            "base_tree": base_tree_sha,
+            "tree": [
+                {
+                    "path": GITHUB_DATA_PATH,
+                    "mode": "100644",
+                    "type": "blob",
+                    "sha": data_blob_sha,
+                },
+                {
+                    "path": GITHUB_INDEX_PATH,
+                    "mode": "100644",
+                    "type": "blob",
+                    "sha": index_blob_sha,
+                },
+            ],
         },
-    }
-    if sha:
-        payload["sha"] = sha
-    github_request("PUT", url, payload)
+    )
+    commit = github_request(
+        "POST",
+        f"{api_root}/git/commits",
+        {
+            "message": "Update TCRshows site data from admin",
+            "tree": tree["sha"],
+            "parents": [parent_sha],
+            "committer": {
+                "name": "TCRshows Admin",
+                "email": "tcrshows-admin@users.noreply.github.com",
+            },
+        },
+    )
+    github_request(
+        "PATCH",
+        f"{api_root}/git/refs/{branch_ref}",
+        {"sha": commit["sha"], "force": False},
+    )
 
 
 def write_payload(payload: dict) -> None:
     serialized_payload = serialize_payload(payload)
+    db_count = len(payload.get("dbRows", []))
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     DATA_FILE.write_text(serialized_payload, encoding="utf-8")
-    persist_payload_to_github(serialized_payload)
+    persist_payload_to_github(serialized_payload, db_count)
 
 
 def convert_excel(path: Path) -> tuple[list[str], list[dict]]:
