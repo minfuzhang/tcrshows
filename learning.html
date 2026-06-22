@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCRshows | 精选学习</title>
+    <meta name="description" content="TCR-T、mRNA肿瘤疫苗、肿瘤免疫相关精选文章。" />
+    <link rel="icon" href="assets/tcrshows-logo-circle.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data/site-data.js"></script>
+  </head>
+  <body class="page-sub">
+    <header class="site-header" id="top">
+      <a class="brand" href="index.html" aria-label="TCRshows 首页">
+        <span class="brand-logo-frame"><img class="brand-logo" src="assets/tcrshows-logo.png" alt="TCRshows" /></span>
+        <span class="brand-text"><strong>TCRshows</strong><small>Cell Therapy knowledge platform</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="database.html">TCRshowsdb</a>
+        <a class="active" href="learning.html">精选学习</a>
+        <a href="services.html">产品服务</a>
+      </nav>
+      <a class="header-action" href="login.html">后台管理</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="page-title">
+        <h1>精选学习</h1>
+        <p>TCR-T、mRNA肿瘤疫苗、肿瘤免疫相关精选文章</p>
+      </section>
+
+      <div class="page-filters" role="tablist" aria-label="文章分类">
+        <button class="active" type="button" data-article-filter="all">全部</button>
+        <button type="button" data-article-filter="TCR-T">TCR-T</button>
+        <button type="button" data-article-filter="mRNA">mRNA</button>
+        <button type="button" data-article-filter="肿瘤免疫">肿瘤免疫</button>
+      </div>
+
+      <section class="article-list-page" data-article-list></section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-grid">
+        <section><h2>TCRshows</h2><p>聚合已验证TCR数据库、学习知识库与服务能力的学习小栈</p></section>
+        <section><h2>联系方式</h2><p>电话：+86 181 9219 6101（同微信）</p></section>
+        <section><h2>快速链接</h2><a href="database.html">数据库检索</a><a href="learning.html">精选学习</a><a href="services.html">产品服务</a></section>
+        <section>
+          <h2>关注我们</h2>
+          <div class="footer-qr-grid">
+            <figure><img src="assets/tcrshows-official-account-qr.jpg" alt="TCRshows公众号二维码" /><figcaption>公众号</figcaption></figure>
+            <figure><img src="assets/tcrshows-mini-program-qr.jpg" alt="TCRshows小程序码" /><figcaption>小程序</figcaption></figure>
+            <figure><img src="assets/tcrshows-knowledge-qr.png" alt="TCRshows知识库二维码" /><figcaption>知识库</figcaption></figure>
+          </div>
+        </section>
+      </div>
+      <div class="footer-bottom"><span>© 2021-2026 TCRshows. All rights reserved.</span><a href="#top" data-scroll-top>返回顶部 ↑</a></div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

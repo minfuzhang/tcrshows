@@ -67,13 +67,20 @@ def serialize_payload(payload: dict) -> str:
     return PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n"
 
 
-def apply_db_count_to_index(page: str, db_count: int) -> str:
-    return re.sub(
-        r'(<span class="metric" data-db-total>)[^<]*(</span>)',
-        rf"\g<1>{db_count}\2",
-        page,
-        count=1,
-    )
+def replace_metric(page: str, attribute: str, value: int) -> str:
+    pattern = rf"(<(?:span|strong)\b[^>]*\b{re.escape(attribute)}\b[^>]*>)[^<]*(</(?:span|strong)>)"
+    return re.sub(pattern, rf"\g<1>{value}\2", page, count=1)
+
+
+def apply_site_metrics_to_index(page: str, payload: dict) -> str:
+    metrics = {
+        "data-db-total": len(payload.get("dbRows", [])),
+        "data-article-total": len(payload.get("articles", [])),
+        "data-service-total": len(payload.get("services", [])),
+    }
+    for attribute, value in metrics.items():
+        page = replace_metric(page, attribute, value)
+    return page
 
 
 def github_request(method: str, url: str, payload: dict | None = None) -> dict:
@@ -110,7 +117,7 @@ def create_github_blob(api_root: str, content: str) -> str:
     return blob["sha"]
 
 
-def persist_payload_to_github(serialized_payload: str, db_count: int) -> None:
+def persist_payload_to_github(serialized_payload: str, payload: dict) -> None:
     api_root = f"https://api.github.com/repos/{GITHUB_REPO}"
     branch_ref = quote(f"heads/{GITHUB_BRANCH}", safe="/")
     ref = github_request("GET", f"{api_root}/git/ref/{branch_ref}")
@@ -119,7 +126,7 @@ def persist_payload_to_github(serialized_payload: str, db_count: int) -> None:
     base_tree_sha = parent_commit["tree"]["sha"]
 
     index_html = (ROOT / "index.html").read_text(encoding="utf-8")
-    index_html = apply_db_count_to_index(index_html, db_count)
+    index_html = apply_site_metrics_to_index(index_html, payload)
     data_blob_sha = create_github_blob(api_root, serialized_payload)
     index_blob_sha = create_github_blob(api_root, index_html)
 
@@ -166,10 +173,9 @@ def persist_payload_to_github(serialized_payload: str, db_count: int) -> None:
 
 def write_payload(payload: dict) -> None:
     serialized_payload = serialize_payload(payload)
-    db_count = len(payload.get("dbRows", []))
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     DATA_FILE.write_text(serialized_payload, encoding="utf-8")
-    persist_payload_to_github(serialized_payload, db_count)
+    persist_payload_to_github(serialized_payload, payload)
 
 
 def convert_excel(path: Path) -> tuple[list[str], list[dict]]:
@@ -326,13 +332,7 @@ def render_login_page(error_message: str = "") -> bytes:
 
 def render_index_page() -> bytes:
     page = (ROOT / "index.html").read_text(encoding="utf-8")
-    db_count = len(read_payload().get("dbRows", []))
-    page = re.sub(
-        r'(<span class="metric" data-db-total>)[^<]*(</span>)',
-        rf"\g<1>{db_count}\2",
-        page,
-        count=1,
-    )
+    page = apply_site_metrics_to_index(page, read_payload())
     return page.encode("utf-8")
 
 

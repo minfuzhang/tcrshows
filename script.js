@@ -32,17 +32,16 @@ let dbRows = readStore(STORAGE_KEYS.dbRows, defaultData.dbRows);
 let articles = readStore(STORAGE_KEYS.articles, defaultData.articles);
 let services = readStore(STORAGE_KEYS.services, defaultData.services);
 let activeArticleFilter = "all";
-let activeServiceFilter = "TCR-T";
+let activeServiceFilter = "all";
 
 const resultBody = document.querySelector("[data-result-body]");
 const resultCount = document.querySelector("[data-result-count]");
 const resultsCard = document.querySelector("[data-results-card]");
 const articleList = document.querySelector("[data-article-list]");
 const serviceList = document.querySelector("[data-service-list]");
-const therapyTrack = document.querySelector("[data-therapy-track]");
-const therapyDots = document.querySelectorAll("[data-therapy-slide]");
+const dbForm = document.querySelector("[data-db-form]");
+const searchForm = document.querySelector("[data-search-form]");
 const scrollTopLink = document.querySelector("[data-scroll-top]");
-const dbTotal = document.querySelector("[data-db-total]");
 
 function readStore(key, fallback) {
   try {
@@ -70,11 +69,9 @@ async function loadServerData() {
     saveStore(STORAGE_KEYS.dbRows, dbRows);
     saveStore(STORAGE_KEYS.articles, articles);
     saveStore(STORAGE_KEYS.services, services);
-    renderMetrics();
-    renderArticles(activeArticleFilter);
-    renderServices(activeServiceFilter);
+    renderAll();
   } catch {
-    // Keep the bundled/default data available when the server cannot be reached.
+    // Keep bundled data available when the server cannot be reached.
   }
 }
 
@@ -103,7 +100,20 @@ function safeUrl(value) {
   return url.replaceAll('"', "%22");
 }
 
+function metricValue(selector, value, suffix = "") {
+  document.querySelectorAll(selector).forEach((node) => {
+    node.textContent = `${value}${suffix}`;
+  });
+}
+
+function renderMetrics() {
+  metricValue("[data-db-total]", dbRows.length);
+  metricValue("[data-article-total]", articles.length);
+  metricValue("[data-service-total]", services.length);
+}
+
 function renderResults(rows) {
+  if (!resultsCard || !resultBody || !resultCount) return;
   resultsCard.hidden = false;
   resultBody.innerHTML = rows
     .map(
@@ -117,31 +127,32 @@ function renderResults(rows) {
   resultCount.textContent = `${rows.length} 条匹配`;
 }
 
-function renderMetrics() {
-  if (dbTotal) {
-    dbTotal.textContent = String(dbRows.length);
-  }
+function levelStars(level) {
+  if (String(level || "").includes("重要")) return "★★★";
+  if (String(level || "").includes("推荐")) return "★★☆";
+  return "☆☆☆";
 }
 
-function renderArticles(filter = "all") {
-  const visible =
-    filter === "all" ? articles : articles.filter((item) => item.category === filter);
+function renderArticles(filter = activeArticleFilter) {
+  if (!articleList) return;
+  const visible = filter === "all" ? articles : articles.filter((item) => item.category === filter);
   articleList.innerHTML = visible
     .map((item) => {
       const url = safeUrl(item.url);
       const target = url.startsWith("http") ? ' target="_blank" rel="noopener"' : "";
       return `
-        <article
-          class="article-card ${item.level === "重要" ? "important" : "normal"}"
-          data-level="${escapeHtml(item.level || "一般")}"
-          data-category="${escapeHtml(item.category)}"
-        >
-          <h3><a class="title-link" href="${escapeHtml(url)}"${target}>${escapeHtml(item.title)}</a></h3>
-          <span class="tag">${escapeHtml(item.category)}</span>
+        <article class="article-card page-card">
+          <div class="card-kicker">
+            <span class="tag">${escapeHtml(item.category)}</span>
+            <span class="stars" aria-label="${escapeHtml(item.level || "一般")}">${levelStars(item.level)}</span>
+          </div>
+          <h3>
+            <a class="title-link" href="${escapeHtml(url)}"${target}>${escapeHtml(item.title)}</a>
+          </h3>
           ${item.summary ? `<p class="card-summary">${escapeHtml(item.summary)}</p>` : ""}
           <div class="card-meta">
-            <span>${escapeHtml(item.author)}</span>
-            <time datetime="${escapeHtml(String(item.date || "").slice(0, 10))}">${escapeHtml(item.date)}</time>
+            <span>${escapeHtml(item.author || "TCRshows")}</span>
+            <time datetime="${escapeHtml(String(item.date || "").slice(0, 10))}">${escapeHtml(item.date || "")}</time>
           </div>
         </article>
       `;
@@ -149,23 +160,22 @@ function renderArticles(filter = "all") {
     .join("");
 }
 
-function renderServices(filter = "TCR-T") {
-  const visible = services.filter((item) => item.category === filter);
+function renderServices(filter = activeServiceFilter) {
+  if (!serviceList) return;
+  const visible = filter === "all" ? services : services.filter((item) => item.category === filter);
   serviceList.innerHTML = visible
     .map((item) => {
       const url = safeUrl(item.url);
       const target = url.startsWith("http") ? ' target="_blank" rel="noopener"' : "";
       const imageMarkup = item.image
         ? `<img class="service-upload-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}缩略图" />`
-        : `<span class="${escapeHtml(item.art || "cell-art")}"></span>`;
+        : "";
       return `
-        <article class="service-card">
-          <div class="service-art" aria-hidden="true">
-            ${imageMarkup}
-          </div>
+        <article class="service-card page-card">
+          ${imageMarkup ? `<div class="service-thumb">${imageMarkup}</div>` : ""}
           <div class="service-content">
+            <span class="tag service-tag">${escapeHtml(item.category)}</span>
             <h3><a class="title-link" href="${escapeHtml(url)}"${target}>${escapeHtml(item.title)}</a></h3>
-            <span class="tag">${escapeHtml(item.category)}</span>
             <p>${escapeHtml(item.text || "")}</p>
             <div class="card-meta">
               <span>${escapeHtml(item.author || "TCRshows")}</span>
@@ -178,74 +188,6 @@ function renderServices(filter = "TCR-T") {
     .join("");
 }
 
-document.querySelector("[data-db-form]").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const form = new FormData(event.currentTarget);
-  const filters = Object.fromEntries(
-    [...form.entries()].map(([key, value]) => [key, normalize(value)]),
-  );
-
-  const filtered = dbRows.filter((row) =>
-    Object.entries(filters).every(([key, value]) => {
-      if (!value) return true;
-      return normalize(row[key]).includes(value);
-    }),
-  );
-
-  renderResults(filtered);
-});
-
-document.querySelector("[data-db-form]").addEventListener("reset", () => {
-  window.setTimeout(() => {
-    resultsCard.hidden = true;
-    resultBody.innerHTML = "";
-    resultCount.textContent = "0 条匹配";
-  }, 0);
-});
-
-document.querySelector("[data-search-form]").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const query = normalize(new FormData(event.currentTarget).get("q"));
-  if (!query) return;
-
-  const matchedArticle = articles.find((item) =>
-    [item.title, item.category, item.summary].some((value) => normalize(value).includes(query)),
-  );
-  if (matchedArticle) {
-    renderArticles(matchedArticle.category);
-    setActive("[data-article-filter]", matchedArticle.category);
-    document.querySelector("#learning").scrollIntoView({ behavior: "smooth" });
-    return;
-  }
-
-  document.querySelector("#database").scrollIntoView({ behavior: "smooth" });
-});
-
-document.querySelectorAll("[data-article-filter]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const filter = button.dataset.articleFilter;
-    activeArticleFilter = filter;
-    setActive("[data-article-filter]", filter);
-    renderArticles(filter);
-  });
-});
-
-document.querySelectorAll("[data-service-filter]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const filter = button.dataset.serviceFilter;
-    activeServiceFilter = filter;
-    setActive("[data-service-filter]", filter);
-    renderServices(filter);
-  });
-});
-
-if (scrollTopLink) {
-  scrollTopLink.addEventListener("click", (event) => {
-    event.preventDefault();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-}
-
 function setActive(selector, value) {
   document.querySelectorAll(selector).forEach((button) => {
     const dataValue = button.dataset.articleFilter || button.dataset.serviceFilter;
@@ -253,32 +195,83 @@ function setActive(selector, value) {
   });
 }
 
-function initTherapyCarousel() {
-  if (!therapyTrack || therapyDots.length === 0) return;
+function initDatabaseForm() {
+  if (!dbForm) return;
+  dbForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const filters = Object.fromEntries(
+      [...form.entries()].map(([key, value]) => [key, normalize(value)]),
+    );
 
-  let activeIndex = 0;
+    const filtered = dbRows.filter((row) =>
+      Object.entries(filters).every(([key, value]) => {
+        if (!value) return true;
+        return normalize(row[key]).includes(value);
+      }),
+    );
 
-  const showSlide = (index) => {
-    activeIndex = (index + therapyDots.length) % therapyDots.length;
-    therapyTrack.style.transform = `translateX(-${activeIndex * 100}%)`;
-    therapyDots.forEach((button, buttonIndex) => {
-      button.classList.toggle("active", buttonIndex === activeIndex);
-    });
-  };
+    renderResults(filtered);
+  });
 
-  let timer = window.setInterval(() => showSlide(activeIndex + 1), 4200);
+  dbForm.addEventListener("reset", () => {
+    window.setTimeout(() => {
+      if (resultsCard) resultsCard.hidden = true;
+      if (resultBody) resultBody.innerHTML = "";
+      if (resultCount) resultCount.textContent = "0 条匹配";
+    }, 0);
+  });
+}
 
-  therapyDots.forEach((button) => {
+function initSearchForm() {
+  if (!searchForm) return;
+  searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const query = normalize(new FormData(event.currentTarget).get("q"));
+    if (!query) return;
+
+    const matchedArticle = articles.find((item) =>
+      [item.title, item.category, item.summary].some((value) => normalize(value).includes(query)),
+    );
+    window.location.href = matchedArticle ? "learning.html" : "database.html";
+  });
+}
+
+function initFilters() {
+  document.querySelectorAll("[data-article-filter]").forEach((button) => {
     button.addEventListener("click", () => {
-      window.clearInterval(timer);
-      showSlide(Number(button.dataset.therapySlide || 0));
-      timer = window.setInterval(() => showSlide(activeIndex + 1), 4200);
+      activeArticleFilter = button.dataset.articleFilter;
+      setActive("[data-article-filter]", activeArticleFilter);
+      renderArticles(activeArticleFilter);
+    });
+  });
+
+  document.querySelectorAll("[data-service-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeServiceFilter = button.dataset.serviceFilter;
+      setActive("[data-service-filter]", activeServiceFilter);
+      renderServices(activeServiceFilter);
     });
   });
 }
 
-initTherapyCarousel();
-renderMetrics();
-renderArticles();
-renderServices();
+function initScrollTop() {
+  if (!scrollTopLink) return;
+  scrollTopLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+function renderAll() {
+  renderMetrics();
+  renderArticles(activeArticleFilter);
+  renderServices(activeServiceFilter);
+}
+
+initDatabaseForm();
+initSearchForm();
+initFilters();
+initScrollTop();
+renderAll();
 loadServerData();

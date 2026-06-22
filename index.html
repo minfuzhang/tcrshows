@@ -12,9 +12,9 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="data/site-data.js"></script>
   </head>
-  <body>
+  <body class="page-home">
     <header class="site-header" id="top">
-      <a class="brand" href="#home" aria-label="TCRshows 首页">
+      <a class="brand" href="index.html" aria-label="TCRshows 首页">
         <span class="brand-logo-frame">
           <img class="brand-logo" src="assets/tcrshows-logo.png" alt="TCRshows" />
         </span>
@@ -25,261 +25,117 @@
       </a>
 
       <nav class="primary-nav" aria-label="主导航">
-        <a href="#home">首页</a>
-        <a href="#database">TCRshowsdb</a>
-        <a href="#learning">精选学习</a>
-        <a href="#services">产品服务</a>
+        <a class="active" href="index.html">首页</a>
+        <a href="database.html">TCRshowsdb</a>
+        <a href="learning.html">精选学习</a>
+        <a href="services.html">产品服务</a>
       </nav>
 
       <a class="header-action" href="login.html">后台管理</a>
     </header>
 
     <main>
-      <section class="hero section" id="home" aria-labelledby="home-title">
-        <div class="hero-content">
-          <p class="eyebrow">TCR-T · mRNA · 肿瘤免疫</p>
-          <h1 id="home-title">TCRshows</h1>
-          <p class="hero-copy">
-            面向TCR-T细胞治疗研究与产业转化的知识门户，整合数据库检索、专题学习和产品服务信息，提供一个学习交流小栈。
-          </p>
+      <section class="home-hero" aria-labelledby="home-title">
+        <p class="home-kicker">TCR-T · mRNA · 肿瘤免疫</p>
+        <h1 id="home-title">TCRshows</h1>
+        <p class="home-copy">
+          面向TCR-T细胞治疗研究与产业转化的知识门户，整合数据库检索、专题学习和产品服务信息，提供一个学习交流小栈。
+        </p>
 
-          <form class="global-search" role="search" data-search-form>
-            <label class="sr-only" for="site-search">搜索TCRshows内容</label>
-            <span class="search-icon" aria-hidden="true"></span>
-            <input
-              id="site-search"
-              name="q"
-              type="search"
-              placeholder="请输入关键字搜索"
-              autocomplete="off"
-            />
-            <button type="submit">搜索</button>
-          </form>
+        <form class="home-search" role="search" data-search-form>
+          <label class="sr-only" for="site-search">搜索TCRshows内容</label>
+          <input
+            id="site-search"
+            name="q"
+            type="search"
+            placeholder="请输入关键字搜索"
+            autocomplete="off"
+          />
+          <button type="submit">搜索</button>
+        </form>
 
-          <div class="hero-actions">
-            <a class="button primary" href="#database">立即检索</a>
-            <a class="button secondary" href="#learning">浏览资讯</a>
-          </div>
+        <div class="home-actions">
+          <a class="button primary" href="database.html">立即检索</a>
+          <a class="button secondary" href="learning.html">浏览资讯</a>
         </div>
 
-        <aside class="hero-panel" aria-label="平台概览">
-          <div class="metric-row">
-            <div>
-              <span class="metric" data-db-total>252</span>
-              <span class="metric-label">条数据库记录</span>
-            </div>
-            <div>
-              <span class="metric">4</span>
-              <span class="metric-label">核心栏目</span>
-            </div>
-          </div>
-          <div class="therapy-card">
-            <div class="therapy-carousel" data-therapy-carousel aria-label="治疗主题轮播">
-              <div class="therapy-track" data-therapy-track>
-                <figure class="therapy-slide">
-                  <img src="assets/tcr-therapy-hero.png" alt="TCR-T细胞治疗主题示意图" />
-                  <figcaption>TCR-T细胞治疗</figcaption>
-                </figure>
-                <figure class="therapy-slide">
-                  <img src="assets/mrna-tumor-vaccine-hero.png" alt="mRNA肿瘤疫苗主题示意图" />
-                  <figcaption>mRNA肿瘤疫苗</figcaption>
-                </figure>
-              </div>
-              <div class="therapy-dots" aria-label="切换治疗主题图片">
-                <button class="active" type="button" data-therapy-slide="0" aria-label="显示TCR-T细胞治疗图片"></button>
-                <button type="button" data-therapy-slide="1" aria-label="显示mRNA肿瘤疫苗图片"></button>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <section class="quick-links section" aria-label="快捷入口">
-        <a class="quick-card blue" href="#database">
-          <span>TCR sequence</span>
-          <strong>数据库检索</strong>
-        </a>
-        <a class="quick-card mint" href="#learning">
-          <span>Protocol</span>
-          <strong>精选文章</strong>
-        </a>
-        <a class="quick-card coral" href="#services">
-          <span>Services</span>
-          <strong>产品服务</strong>
-        </a>
-      </section>
-
-      <section class="section split-section" id="database" aria-labelledby="database-title">
-        <div class="section-heading">
-          <p class="eyebrow">TCRshows-db</p>
-          <h2 id="database-title">数据库查询</h2>
-          <p>
-            支持按TCRshows-ID、HLA、Peptide、Pos、Antigen、CDR3a、CDR3β、TRAV、TRAJ、TRBV、TRBJ、Functional Validation、aka、Reference、Year等字段组合检索。
-          </p>
-        </div>
-
-        <div class="database-layout">
-          <form class="db-form" data-db-form>
-            <div class="form-grid">
-              <label>
-                <span>TCRshows-ID</span>
-                <input name="id" placeholder="如 0001" />
-              </label>
-              <label>
-                <span>HLA</span>
-                <input name="hla" placeholder="如 HLA-A*02:01" />
-              </label>
-              <label>
-                <span>Peptide</span>
-                <input name="peptide" placeholder="如 SLLMWITQC" />
-              </label>
-              <label>
-                <span>Pos</span>
-                <input name="pos" placeholder="如 157-165" />
-              </label>
-              <label>
-                <span>Antigen</span>
-                <input name="antigen" placeholder="如 NY-ESO-1" />
-              </label>
-              <label>
-                <span>CDR3a</span>
-                <input name="cdr3a" placeholder="如 CAVRPTSGGSYIPTF" />
-              </label>
-              <label>
-                <span>CDR3β</span>
-                <input name="cdr3b" placeholder="如 CASSYVGNTGELFF" />
-              </label>
-              <label>
-                <span>TRAV</span>
-                <input name="trav" placeholder="如 TRAV21" />
-              </label>
-              <label>
-                <span>TRAJ</span>
-                <input name="traj" placeholder="如 TRAJ6" />
-              </label>
-              <label>
-                <span>TRBV</span>
-                <input name="trbv" placeholder="如 TRBV6-5" />
-              </label>
-              <label>
-                <span>TRBJ</span>
-                <input name="trbj" placeholder="如 TRBJ2-2*01" />
-              </label>
-              <label>
-                <span>Functional Validation</span>
-                <input name="functionalValidation" placeholder="请输入 Functional Validation" />
-              </label>
-              <label>
-                <span>aka</span>
-                <input name="aka" placeholder="如 1G4" />
-              </label>
-              <label>
-                <span>Reference</span>
-                <input name="reference" placeholder="请输入 Reference" />
-              </label>
-              <label>
-                <span>Year</span>
-                <input name="year" placeholder="请输入 Year" />
-              </label>
-            </div>
-            <div class="form-actions">
-              <button class="button primary" type="submit">查询</button>
-              <button class="button quiet" type="reset">重置</button>
-            </div>
-          </form>
-
-          <div class="results-card" data-results-card hidden>
-            <div class="results-head">
-              <h3>查询结果</h3>
-              <span data-result-count>0 条匹配</span>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>TCRshows-ID</th>
-                    <th>HLA</th>
-                    <th>Peptide</th>
-                    <th>Pos</th>
-                    <th>Antigen</th>
-                    <th>CDR3a</th>
-                    <th>CDR3β</th>
-                    <th>TRAV</th>
-                    <th>TRAJ</th>
-                    <th>TRBV</th>
-                    <th>TRBJ</th>
-                    <th>Functional Validation</th>
-                    <th>aka</th>
-                    <th>Reference</th>
-                    <th>Year</th>
-                  </tr>
-                </thead>
-                <tbody data-result-body></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="learning" aria-labelledby="learning-title">
-        <div class="section-heading inline-heading">
+        <div class="home-stats" aria-label="平台统计">
           <div>
-            <p class="eyebrow">Featured learning</p>
-            <h2 id="learning-title">精选学习</h2>
+            <strong data-db-total>252</strong>
+            <span>数据库记录</span>
           </div>
-          <div class="segmented" role="tablist" aria-label="文章分类">
-            <button class="active" type="button" data-article-filter="all">全部</button>
-            <button type="button" data-article-filter="TCR-T">TCR-T</button>
-            <button type="button" data-article-filter="mRNA">mRNA</button>
-            <button type="button" data-article-filter="肿瘤免疫">肿瘤免疫</button>
+          <div>
+            <strong data-article-total>9</strong>
+            <span>精选文章</span>
+          </div>
+          <div>
+            <strong data-service-total>14</strong>
+            <span>服务项目</span>
+          </div>
+          <div>
+            <strong>4</strong>
+            <span>核心栏目</span>
           </div>
         </div>
-
-        <div class="article-grid" data-article-list></div>
       </section>
 
-      <section class="section services-section" id="services" aria-labelledby="services-title">
-        <div class="section-heading inline-heading">
-          <div>
-            <p class="eyebrow">Products & services</p>
-            <h2 id="services-title">产品与服务</h2>
-          </div>
-          <div class="chip-row" aria-label="产品分类">
-            <button class="active" type="button" data-service-filter="TCR-T">TCR-T</button>
-            <button type="button" data-service-filter="mRNA">mRNA</button>
-            <button type="button" data-service-filter="pHLA">pHLA</button>
-            <button type="button" data-service-filter="TCR蛋白">TCR蛋白</button>
-            <button type="button" data-service-filter="细胞株构建">细胞株构建</button>
-          </div>
-        </div>
-
-        <div class="service-layout">
-          <div class="service-list" data-service-list></div>
-          <aside class="qr-panel" aria-label="TCRshows二维码">
-            <div class="qr-card">
-              <img src="assets/tcrshows-official-account-qr.jpg" alt="TCRshows公众号二维码" />
-              <strong>TCRshows公众号</strong>
-            </div>
-            <div class="qr-card">
-              <img src="assets/tcrshows-mini-program-qr.jpg" alt="TCRshows小程序码" />
-              <strong>TCRshows小程序</strong>
-            </div>
-            <div class="qr-card">
-              <img src="assets/tcrshows-knowledge-qr.png" alt="TCRshows知识库二维码" />
-              <strong>TCRshows知识库</strong>
-            </div>
-          </aside>
-        </div>
+      <section class="home-entry-grid" aria-label="快捷入口">
+        <a class="home-entry-card" href="database.html">
+          <span class="entry-icon blue">▣</span>
+          <strong>TCR sequence</strong>
+          <small>数据库检索</small>
+        </a>
+        <a class="home-entry-card" href="learning.html">
+          <span class="entry-icon green">▤</span>
+          <strong>Protocol</strong>
+          <small>精选文章</small>
+        </a>
+        <a class="home-entry-card" href="services.html">
+          <span class="entry-icon purple">✦</span>
+          <strong>Services</strong>
+          <small>产品服务</small>
+        </a>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div>
-        <strong>TCRshows</strong>
-        <p>聚合已验证TCR数据库、学习知识库与服务能力的学习小栈</p>
-        <p>联系方式：+86 181 9219 6101（同微信）</p>
+    <footer class="app-footer">
+      <div class="footer-grid">
+        <section>
+          <h2>TCRshows</h2>
+          <p>聚合已验证TCR数据库、学习知识库与服务能力的学习小栈</p>
+        </section>
+        <section>
+          <h2>联系方式</h2>
+          <p>电话：+86 181 9219 6101（同微信）</p>
+        </section>
+        <section>
+          <h2>快速链接</h2>
+          <a href="database.html">数据库检索</a>
+          <a href="learning.html">精选学习</a>
+          <a href="services.html">产品服务</a>
+        </section>
+        <section>
+          <h2>关注我们</h2>
+          <div class="footer-qr-grid">
+            <figure>
+              <img src="assets/tcrshows-official-account-qr.jpg" alt="TCRshows公众号二维码" />
+              <figcaption>公众号</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/tcrshows-mini-program-qr.jpg" alt="TCRshows小程序码" />
+              <figcaption>小程序</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/tcrshows-knowledge-qr.png" alt="TCRshows知识库二维码" />
+              <figcaption>知识库</figcaption>
+            </figure>
+          </div>
+        </section>
       </div>
-      <a href="#top" data-scroll-top>返回顶部</a>
+      <div class="footer-bottom">
+        <span>© 2021-2026 TCRshows. All rights reserved.</span>
+        <a href="#top" data-scroll-top>返回顶部 ↑</a>
+      </div>
     </footer>
 
     <script src="script.js"></script>
