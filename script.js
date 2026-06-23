@@ -128,9 +128,19 @@ function renderResults(rows) {
 }
 
 function levelStars(level) {
-  if (String(level || "").includes("重要")) return "★★★";
-  if (String(level || "").includes("推荐")) return "★★☆";
-  return "☆☆☆";
+  const text = String(level || "").trim();
+  let filled = Math.min(3, Math.max(0, (text.match(/★/g) || []).length));
+
+  if (!filled) {
+    if (/3|重要|高/.test(text)) filled = 3;
+    else if (/2|推荐|中/.test(text)) filled = 2;
+    else if (/1|一般|低/.test(text)) filled = 1;
+  }
+
+  return Array.from({ length: 3 }, (_, index) => {
+    const className = index < filled ? "star filled" : "star empty";
+    return `<span class="${className}" aria-hidden="true">★</span>`;
+  }).join("");
 }
 
 function renderArticles(filter = activeArticleFilter) {
