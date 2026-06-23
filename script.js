@@ -181,7 +181,7 @@ function renderServices(filter = activeServiceFilter) {
         ? `<img class="service-upload-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}缩略图" />`
         : "";
       return `
-        <article class="service-card page-card">
+        <article class="service-card page-card${imageMarkup ? "" : " no-thumb"}">
           ${imageMarkup ? `<div class="service-thumb">${imageMarkup}</div>` : ""}
           <div class="service-content">
             <span class="tag service-tag">${escapeHtml(item.category)}</span>
