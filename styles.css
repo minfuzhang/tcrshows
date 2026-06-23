@@ -2368,3 +2368,23 @@ td {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Slightly inset footer content from the left edge */
+.app-footer {
+  padding-left: clamp(36px, 4.5vw, 84px);
+  padding-right: 24px;
+}
+
+.footer-grid,
+.footer-bottom {
+  width: min(100%, 1780px);
+  margin-left: 0;
+  margin-right: auto;
+}
+
+@media (max-width: 760px) {
+  .app-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
