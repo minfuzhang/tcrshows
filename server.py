@@ -21,6 +21,12 @@ import openpyxl
 ROOT = Path(__file__).resolve().parent
 DEFAULT_DATA_FILE = ROOT / "data" / "site-data.js"
 DATA_FILE = ROOT / "storage" / "site-data.js"
+PUBLIC_DATA_FILES = {
+    "meta": ROOT / "data" / "site-meta.js",
+    "db": ROOT / "data" / "site-db.js",
+    "articles": ROOT / "data" / "site-articles.js",
+    "services": ROOT / "data" / "site-services.js",
+}
 EXCEL_FILE = ROOT / "data" / "TCRshows-db.xlsx"
 UPLOAD_DIR = ROOT / "assets" / "uploads"
 PREFIX = "window.TCRSHOWS_DEFAULT_DATA = "
@@ -48,6 +54,12 @@ GITHUB_REPO = os.environ.get("TCRSHOWS_GITHUB_REPO", "minfuzhang/tcrshows").stri
 GITHUB_BRANCH = os.environ.get("TCRSHOWS_GITHUB_BRANCH", "main").strip()
 GITHUB_DATA_PATH = os.environ.get("TCRSHOWS_GITHUB_DATA_PATH", "data/site-data.js").strip()
 GITHUB_INDEX_PATH = os.environ.get("TCRSHOWS_GITHUB_INDEX_PATH", "index.html").strip()
+GITHUB_PUBLIC_DATA_PATHS = {
+    "meta": "data/site-meta.js",
+    "db": "data/site-db.js",
+    "articles": "data/site-articles.js",
+    "services": "data/site-services.js",
+}
 SESSION_COOKIE = "tcrshows_admin_session"
 SESSION_TTL_SECONDS = 8 * 60 * 60
 SESSIONS: dict[str, float] = {}
@@ -65,6 +77,34 @@ def read_payload() -> dict:
 
 def serialize_payload(payload: dict) -> str:
     return PREFIX + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n"
+
+
+def serialize_js_var(variable_name: str, value) -> str:
+    return f"window.{variable_name} = " + json.dumps(value, ensure_ascii=False, indent=2) + ";\n"
+
+
+def build_public_payloads(payload: dict) -> dict[str, str]:
+    return {
+        "meta": serialize_js_var(
+            "TCRSHOWS_META",
+            {
+                "dbTotal": len(payload.get("dbRows", [])),
+                "articleTotal": len(payload.get("articles", [])),
+                "serviceTotal": len(payload.get("services", [])),
+                "coreTotal": 4,
+            },
+        ),
+        "db": serialize_js_var("TCRSHOWS_DB_ROWS", payload.get("dbRows", [])),
+        "articles": serialize_js_var("TCRSHOWS_ARTICLES", payload.get("articles", [])),
+        "services": serialize_js_var("TCRSHOWS_SERVICES", payload.get("services", [])),
+    }
+
+
+def write_public_payloads(payload: dict) -> dict[str, str]:
+    public_payloads = build_public_payloads(payload)
+    for key, content in public_payloads.items():
+        PUBLIC_DATA_FILES[key].write_text(content, encoding="utf-8")
+    return public_payloads
 
 
 def replace_metric(page: str, attribute: str, value: int) -> str:
@@ -127,28 +167,43 @@ def persist_payload_to_github(serialized_payload: str, payload: dict) -> None:
 
     index_html = (ROOT / "index.html").read_text(encoding="utf-8")
     index_html = apply_site_metrics_to_index(index_html, payload)
+    public_payloads = build_public_payloads(payload)
     data_blob_sha = create_github_blob(api_root, serialized_payload)
     index_blob_sha = create_github_blob(api_root, index_html)
+    public_blob_shas = {
+        key: create_github_blob(api_root, content)
+        for key, content in public_payloads.items()
+    }
+    tree_items = [
+        {
+            "path": GITHUB_DATA_PATH,
+            "mode": "100644",
+            "type": "blob",
+            "sha": data_blob_sha,
+        },
+        {
+            "path": GITHUB_INDEX_PATH,
+            "mode": "100644",
+            "type": "blob",
+            "sha": index_blob_sha,
+        },
+    ]
+    tree_items.extend(
+        {
+            "path": GITHUB_PUBLIC_DATA_PATHS[key],
+            "mode": "100644",
+            "type": "blob",
+            "sha": blob_sha,
+        }
+        for key, blob_sha in public_blob_shas.items()
+    )
 
     tree = github_request(
         "POST",
         f"{api_root}/git/trees",
         {
             "base_tree": base_tree_sha,
-            "tree": [
-                {
-                    "path": GITHUB_DATA_PATH,
-                    "mode": "100644",
-                    "type": "blob",
-                    "sha": data_blob_sha,
-                },
-                {
-                    "path": GITHUB_INDEX_PATH,
-                    "mode": "100644",
-                    "type": "blob",
-                    "sha": index_blob_sha,
-                },
-            ],
+            "tree": tree_items,
         },
     )
     commit = github_request(
@@ -175,6 +230,7 @@ def write_payload(payload: dict) -> None:
     serialized_payload = serialize_payload(payload)
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     DATA_FILE.write_text(serialized_payload, encoding="utf-8")
+    write_public_payloads(payload)
     persist_payload_to_github(serialized_payload, payload)
 
 

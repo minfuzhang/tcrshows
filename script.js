@@ -1,9 +1,3 @@
-const STORAGE_KEYS = {
-  dbRows: "tcrshows.dbRows",
-  articles: "tcrshows.articles",
-  services: "tcrshows.services",
-};
-
 const DB_FIELDS = [
   "id",
   "hla",
@@ -22,15 +16,12 @@ const DB_FIELDS = [
   "year",
 ];
 
-const defaultData = window.TCRSHOWS_DEFAULT_DATA || {
-  dbRows: [],
-  articles: [],
-  services: [],
-};
+const defaultData = window.TCRSHOWS_DEFAULT_DATA || {};
+const siteMeta = window.TCRSHOWS_META || {};
 
-let dbRows = readStore(STORAGE_KEYS.dbRows, defaultData.dbRows);
-let articles = readStore(STORAGE_KEYS.articles, defaultData.articles);
-let services = readStore(STORAGE_KEYS.services, defaultData.services);
+let dbRows = window.TCRSHOWS_DB_ROWS || defaultData.dbRows || [];
+let articles = window.TCRSHOWS_ARTICLES || defaultData.articles || [];
+let services = window.TCRSHOWS_SERVICES || defaultData.services || [];
 let activeArticleFilter = "all";
 let activeServiceFilter = "all";
 
@@ -42,38 +33,6 @@ const serviceList = document.querySelector("[data-service-list]");
 const dbForm = document.querySelector("[data-db-form]");
 const searchForm = document.querySelector("[data-search-form]");
 const scrollTopLink = document.querySelector("[data-scroll-top]");
-
-function readStore(key, fallback) {
-  try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function saveStore(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-async function loadServerData() {
-  if (location.protocol !== "http:" && location.protocol !== "https:") return;
-
-  try {
-    const response = await fetch(`/api/data?ts=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) return;
-    const payload = await response.json();
-    dbRows = Array.isArray(payload.dbRows) ? payload.dbRows : dbRows;
-    articles = Array.isArray(payload.articles) ? payload.articles : articles;
-    services = Array.isArray(payload.services) ? payload.services : services;
-    saveStore(STORAGE_KEYS.dbRows, dbRows);
-    saveStore(STORAGE_KEYS.articles, articles);
-    saveStore(STORAGE_KEYS.services, services);
-    renderAll();
-  } catch {
-    // Keep bundled data available when the server cannot be reached.
-  }
-}
 
 function normalize(value) {
   return String(value || "")
@@ -107,9 +66,9 @@ function metricValue(selector, value, suffix = "") {
 }
 
 function renderMetrics() {
-  metricValue("[data-db-total]", dbRows.length);
-  metricValue("[data-article-total]", articles.length);
-  metricValue("[data-service-total]", services.length);
+  metricValue("[data-db-total]", siteMeta.dbTotal ?? dbRows.length);
+  metricValue("[data-article-total]", siteMeta.articleTotal ?? articles.length);
+  metricValue("[data-service-total]", siteMeta.serviceTotal ?? services.length);
 }
 
 function renderResults(rows) {
@@ -284,4 +243,3 @@ initSearchForm();
 initFilters();
 initScrollTop();
 renderAll();
-loadServerData();
