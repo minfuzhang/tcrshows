@@ -54,6 +54,9 @@ GITHUB_REPO = os.environ.get("TCRSHOWS_GITHUB_REPO", "minfuzhang/tcrshows").stri
 GITHUB_BRANCH = os.environ.get("TCRSHOWS_GITHUB_BRANCH", "main").strip()
 GITHUB_DATA_PATH = os.environ.get("TCRSHOWS_GITHUB_DATA_PATH", "data/site-data.js").strip()
 GITHUB_INDEX_PATH = os.environ.get("TCRSHOWS_GITHUB_INDEX_PATH", "index.html").strip()
+PUBLIC_SITE_ORIGIN = os.environ.get("TCRSHOWS_PUBLIC_SITE_ORIGIN", "https://tcrshows.com").rstrip("/")
+ADMIN_HOSTS = {"admin.tcrshows.com"}
+PUBLIC_PAGE_ROUTES = {"/index.html", "/database.html", "/learning.html", "/services.html"}
 GITHUB_PUBLIC_DATA_PATHS = {
     "meta": "data/site-meta.js",
     "db": "data/site-db.js",
@@ -410,6 +413,22 @@ class TCRshowsHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         route = urlsplit(self.path).path
+        host = self.headers.get("Host", "").split(":", 1)[0].lower()
+
+        if host in ADMIN_HOSTS:
+            if route == "/":
+                self.send_response(HTTPStatus.SEE_OTHER)
+                self.send_header("Location", "/admin.html")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            if route in PUBLIC_PAGE_ROUTES:
+                public_path = "/" if route == "/index.html" else route
+                self.send_response(HTTPStatus.SEE_OTHER)
+                self.send_header("Location", f"{PUBLIC_SITE_ORIGIN}{public_path}")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
 
         if route in {"/", "/index.html"}:
             body = render_index_page()
